@@ -1,0 +1,3 @@
+import deepdsp
+
+deepdsp.main()
