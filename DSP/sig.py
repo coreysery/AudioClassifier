@@ -12,8 +12,9 @@ class Signal():
         Signal.validate(spf, filepath)
 
         # Extract Raw Audio from Wav File
-        signal = np.fromstring(spf.readframes(-1), 'Int16')
-        self.length = spf.getnframes()
+        signal = np.fromstring(spf.readframes(4096), 'Int16')
+        # self.length = spf.getnframes()
+        self.length = 4096
         self.sampleRate = spf.getframerate()
 
         # audio is 16 bit so we have to normalize amplitude to be
@@ -22,18 +23,18 @@ class Signal():
 
         # Sets the digital amp to be between -1 and 1. type float64
         self.signal = normalize(signal)
-        # self.signal = self.signal.reshape(1, self.length)
+        self.signal = self.signal.reshape(1, self.length)
 
         spf.close()
 
     def plot(self):
         plt.figure(1)
         plt.title('Signal Wave')
-        print(self.signal)
-
-        plt.plot(self.signal)
+        signal = self.signal.reshape(self.length, 1)
+        plt.plot(signal)
         plt.show()
 
+    """Validate that audio files fill requirement or throw an error otherwise"""
     @staticmethod
     def validate(spf, filepath):
         if not spf.getnchannels() == AUDIO_REQ["channels"]:

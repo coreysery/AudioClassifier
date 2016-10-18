@@ -3,7 +3,7 @@ from DSP import Signal
 
 from config import ROOT_DIR
 
-kickpath = os.path.join(ROOT_DIR, 'resources/audio/kick/k1.wav')
+kickpath = os.path.join(ROOT_DIR, 'resources/audio/kick/k8.wav')
 snarepath = os.path.join(ROOT_DIR, 'resources/audio/snare/s2.wav')
 
 kick = Signal(kickpath)
