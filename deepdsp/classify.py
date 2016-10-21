@@ -30,5 +30,9 @@ def main():
 
     print(audio_matrix.shape)
     print(classifications.shape)
+    track_count, sample_length = audio_matrix.shape
+
+
+
 
 
