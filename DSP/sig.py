@@ -1,9 +1,8 @@
 import wave
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-from math import pi, cos, sin, ceil, fabs, log
-import DSP.util as util
+
+from math import ceil, fabs
 from config import AUDIO_REQ
 
 MAX_FREQ = AUDIO_REQ["sample_rate"]/2
@@ -22,7 +21,7 @@ class Signal():
             signal = np.fromstring(spf.readframes(-1), 'Int16')
 
             # Initialize signal array
-            self.signal = np.zeros((length))
+            self.signal = np.zeros((length,1))
             self.length = length
             self.sampleRate = spf.getframerate()
 
@@ -30,8 +29,8 @@ class Signal():
             # Sets the digital amp to be between -1 and 1. type float64
             maxAmp = (2 ** 16) / 2
             normalize = np.vectorize(lambda amp: amp / maxAmp)
-            self.signal[:spf.getnframes()] = normalize(signal)
-            self.signal = self.signal.reshape(1, length)
+            self.signal[:spf.getnframes(),0] = normalize(signal)
+            self.signal = self.signal.reshape(length, 1)
 
             spf.close()
 
@@ -47,49 +46,34 @@ class Signal():
 
         num_buffs = int(ceil(self.length / BUF_SIZE))
 
-        # Compute freqs to use
-        base = MAX_FREQ ** (1/res)
-        # Start freqs at 20
-        t = int(ceil( log(MIN_FREQ, base) ))
-        freqs = np.zeros((res-t), dtype=int)
-        for i in range(t, res):
-            freqs[i-t] = int(base ** i)
-
         # Perform DFT for each buffer
-        out = np.zeros((len(freqs), 0))
+        out = np.zeros((BUF_SIZE, 0))
         print(num_buffs)
-        for i in range(0, num_buffs):
+        for i in range(num_buffs):
             print(i)
             start = i * BUF_SIZE
             end = (i + 1) * BUF_SIZE
-            if end > self.length:
-                end = self.length % BUF_SIZE
 
-            signal_chunk = self.signal[ 0,start:end ]
-            chunk = util.dft(signal_chunk, freqs)
+            if end > self.length:
+                pad_length = end - self.length
+                pad = np.zeros((pad_length, 1))
+                signal_chunk = np.vstack((self.signal[start:], pad))
+            else:
+                signal_chunk = self.signal[ start:end ]
+
+            # chunk = util.fft(signal_chunk)
+            chunk = np.fft.fft(signal_chunk)
             out = np.hstack((out, chunk))
+
+        freqs = []
+        for i in range(BUF_SIZE):
+            freqs.append(i * AUDIO_REQ['sample_rate'] / BUF_SIZE)
+
+        print(freqs)
 
         return (freqs, out)
 
 
-    def plotFreqs(self, res):
-        freqs, amps = self.signalDFT(res)
-
-        print(amps)
-
-        plt.plot(freqs, amps)
-        plt.xscale('log')
-        plt.title('Frequencies')
-        plt.grid(True)
-        plt.show()
-
-    def plotAmp(self):
-        plt.figure(1)
-        plt.title('Signal Wave')
-
-        signal = self.signal.reshape(self.length, 1)
-        plt.plot(signal)
-        plt.show()
 
     def plot(self, res):
         plt.grid(True)
@@ -103,37 +87,29 @@ class Signal():
         plt.plot(timeDomain)
 
         # Plot freq domain
-        # plt.figure(2)
         plt.subplot(212)
-        plt.title('Frequencies')
-        plt.xscale('log')
-        plt.axis([0.0, 25000.0, -1.0, 1.0])
         ax = plt.gca()
         ax.set_autoscale_on(False)
 
         freqs, amps = self.signalDFT(res)
 
-        print(amps.shape)
-
+        _, length = amps.shape
         vecreal = np.vectorize(lambda a: fabs(a.real))
         amps = vecreal(amps)
-
-        _, length = amps.shape
 
         plt.ion()
 
         for i in range(length):
-            plt.cla()
             plt.title('Frequencies')
             plt.xscale('log')
-            plt.axis([0.0, 25000.0, -1.0, 1.0])
-            ax = plt.gca()
             ax.set_autoscale_on(False)
+            # plt.axis([0.0, 25000.0, -0.1, 1.0])
 
             plt.plot(freqs, amps[:,i])
-            plt.pause(0.1)
+            plt.pause(0.5)
+            plt.cla()
 
-        plt.pause(60)
+        plt.pause(4)
 
         plt.show()
 
