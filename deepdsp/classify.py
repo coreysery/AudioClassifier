@@ -12,7 +12,7 @@ def main():
     )
 
     # All tracks in a matrix
-    audio_matrix = np.zeros((0,4096))
+    audio_matrix = np.zeros((0,88200))
     # Each track classified
     classifications = np.zeros((0, len(samples)))
 
@@ -25,11 +25,9 @@ def main():
 
         # append each track to the audio matrix
         for track in list:
-            audio_matrix = np.vstack((audio_matrix, track.signal))
+            audio_matrix = np.vstack((audio_matrix, track.signal.reshape((1,88200))))
 
 
-    print(audio_matrix.shape)
-    print(classifications.shape)
     track_count, sample_length = audio_matrix.shape
 
 

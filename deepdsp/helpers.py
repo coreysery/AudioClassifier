@@ -14,6 +14,7 @@ def loadAudio(dir):
             continue
 
         filepath = os.path.join(ROOT_DIR, 'resources/audio/', dir, fn)
-        tracks.append(Signal(filepath))
+
+        tracks.append(Signal(filepath, 88200))
 
     return tracks
