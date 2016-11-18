@@ -67,16 +67,11 @@ class Signal():
             newChunk = np.zeros((0, 2))
             for _, val in enumerate(chunk):
                 k = np.array([val.real, val.imag]).reshape((1,2))
-
-                print(k.shape)
-                print(newChunk.shape)
                 newChunk = np.vstack((newChunk, k))
 
             newChunk = newChunk.reshape((newChunk.shape[0], 1, 2))
-            print(newChunk.shape)
-            print(out.shape)
 
-            out = np.vstack((out, newChunk))
+            out = np.hstack((out, newChunk))
 
         return out
 
