@@ -1,6 +1,7 @@
 import wave
 import matplotlib.pyplot as plt
 import numpy as np
+import tensorflow as tf
 
 from math import ceil, fabs
 from config import AUDIO_REQ
@@ -41,16 +42,16 @@ class Signal():
             self.sampleRate = AUDIO_REQ['sample_rate']
 
 
-    def signalDFT(self, res=128):
+    def signalDFT(self):
         _, N = self.signal.shape
 
         num_buffs = int(ceil(self.length / BUF_SIZE))
 
         # Perform DFT for each buffer
-        out = np.zeros((BUF_SIZE, 0))
-        print(num_buffs)
+        # buf_size x num_buffs x complex
+        out = np.zeros((BUF_SIZE, 0, 2))
+
         for i in range(num_buffs):
-            print(i)
             start = i * BUF_SIZE
             end = (i + 1) * BUF_SIZE
 
@@ -63,15 +64,21 @@ class Signal():
 
             # chunk = util.fft(signal_chunk)
             chunk = np.fft.fft(signal_chunk)
-            out = np.hstack((out, chunk))
+            newChunk = np.zeros((0, 2))
+            for _, val in enumerate(chunk):
+                k = np.array([val.real, val.imag]).reshape((1,2))
 
-        freqs = []
-        for i in range(BUF_SIZE):
-            freqs.append(i * AUDIO_REQ['sample_rate'] / BUF_SIZE)
+                print(k.shape)
+                print(newChunk.shape)
+                newChunk = np.vstack((newChunk, k))
 
-        print(freqs)
+            newChunk = newChunk.reshape((newChunk.shape[0], 1, 2))
+            print(newChunk.shape)
+            print(out.shape)
 
-        return (freqs, out)
+            out = np.vstack((out, newChunk))
+
+        return out
 
 
 
