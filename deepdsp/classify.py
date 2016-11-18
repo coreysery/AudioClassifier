@@ -49,7 +49,6 @@ def main():
         for j, track in enumerate(samples_list):
             dft = track.signalDFT()
             dft = dft.reshape((1, dft.shape[0], dft.shape[1], 2))
-            print(dft.shape)
             print(audio_matrix.shape)
             audio_matrix = np.vstack((audio_matrix, dft))
 
@@ -92,7 +91,7 @@ def main():
     testX = testX.reshape([-1, testX.shape[1], testX.shape[2], 2])
 
     # Building convolutional network
-    network = input_data(shape=[None, 1024, 44, 1], name='input')
+    network = input_data(shape=[None, 1024, 44, 2], name='input')
     # highway convolutions with pooling and dropout
     for i in range(3):
         for j in [3, 2, 1]:
@@ -102,7 +101,7 @@ def main():
 
     network = fully_connected(network, 128, activation='elu')
     network = fully_connected(network, 256, activation='elu')
-    network = fully_connected(network, 10, activation='softmax')
+    network = fully_connected(network, 2, activation='softmax')
     network = regression(network, optimizer='adam', learning_rate=0.01,
                          loss='categorical_crossentropy', name='target')
 
