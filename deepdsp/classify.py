@@ -24,6 +24,9 @@ def main():
     library = dict(
         kick=loadAudio('kick'),
         snare=loadAudio('snare'),
+        clap=loadAudio('clap'),
+        tom=loadAudio('tom'),
+        hihat=loadAudio('hihat'),
     )
 
 
@@ -47,12 +50,13 @@ def main():
 
         # append each track to the audio matrix
         for j, track in enumerate(samples_list):
+            print("loading: ", kind, " track: ", j+1,"/", len(samples_list))
+
             dft = track.signalDFT()
             dft = dft.reshape((1, dft.shape[0], dft.shape[1], 2))
-            print(audio_matrix.shape)
             audio_matrix = np.vstack((audio_matrix, dft))
 
-
+    print("done loading")
     # Randomize Audio
     combined = list(zip(audio_matrix, classifications))
     shuffle(combined)
@@ -61,23 +65,23 @@ def main():
 
     # Ratios
     ratio_train = .8
-    ratio_test = .1
-    ratio_validation = .1
+    ratio_test = .2
+    # ratio_validation = .1
 
     # Length of each type according to respective ratios
     train_len = int(ratio_train * classifications.shape[0])
     test_len = int(ratio_test * classifications.shape[0])
-    validation_len = int(ratio_validation * classifications.shape[0])
+    # validation_len = int(ratio_validation * classifications.shape[0])
 
     # Binary Classifications
     training_labels = classifications[:train_len, :]
     test_labels = classifications[train_len + 1:train_len + test_len, :]
-    validation_labels = classifications[train_len + test_len + 1:, :]
+    # validation_labels = classifications[train_len + test_len + 1:, :]
 
     # Respective datasets
     training_matrix = audio_matrix[:train_len, :]
     testing_matrix = audio_matrix[train_len + 1:train_len + test_len, :]
-    validation_matrix = audio_matrix[train_len + test_len + 1:, :]
+    # validation_matrix = audio_matrix[train_len + test_len + 1:, :]
 
     # track_count, sample_length = audio_matrix.shape
 
@@ -99,13 +103,14 @@ def main():
         network = max_pool_2d(network, 2)
         network = batch_normalization(network)
 
-    network = fully_connected(network, 128, activation='elu')
     network = fully_connected(network, 256, activation='elu')
-    network = fully_connected(network, 2, activation='softmax')
-    network = regression(network, optimizer='adam', learning_rate=0.01,
+    network = fully_connected(network, 128, activation='elu')
+    network = fully_connected(network, len(library), activation='softmax')
+    network = regression(network, optimizer='sgd', learning_rate=0.01,
                          loss='categorical_crossentropy', name='target')
 
+    print("Training")
     # Training
-    model = tflearn.DNN(network, tensorboard_verbose=0)
+    model = tflearn.DNN(network, tensorboard_verbose=3)
     model.fit(X, Y, n_epoch=20, validation_set=(testX, testY),
               show_metric=True, run_id='convnet_highway_mnist')

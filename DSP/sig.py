@@ -16,7 +16,7 @@ class Signal():
         if type(input) == str:
             # Open wave file
             spf = wave.open(input, mode='rb')
-            Signal.validate(spf, input)
+            # Signal.validate(spf, input)
 
             # Extract Raw Audio from Wav File
             signal = np.fromstring(spf.readframes(-1), 'Int16')
@@ -25,12 +25,18 @@ class Signal():
             self.signal = np.zeros((length,1))
             self.length = length
             self.sampleRate = spf.getframerate()
+            self.channels = spf.getnchannels()
 
             # audio is 16 bit
             # Sets the digital amp to be between -1 and 1. type float64
             maxAmp = (2 ** 16) / 2
             normalize = np.vectorize(lambda amp: amp / maxAmp)
-            self.signal[:spf.getnframes(),0] = normalize(signal)
+
+            if spf.getnframes() > length:
+                self.signal[:length,0] = normalize(signal[:length])
+            else:
+                self.signal[:spf.getnframes(),0] = normalize(signal)
+
             self.signal = self.signal.reshape(length, 1)
 
             spf.close()
