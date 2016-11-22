@@ -1,14 +1,11 @@
 import wave
 import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
 
 from math import ceil, fabs
-from config import AUDIO_REQ
+# from config import AUDIO
+from .conf import *
 
-MAX_FREQ = AUDIO_REQ["sample_rate"]/2
-MIN_FREQ = 20
-BUF_SIZE = 1024
 
 class Signal():
     def __init__(self, input, length):
@@ -45,21 +42,21 @@ class Signal():
         if type(input) == np.ndarray:
             self.signal = input
             self.length = length
-            self.sampleRate = AUDIO_REQ['sample_rate']
+            self.sampleRate = sample_rate
 
 
     def signalDFT(self):
         _, N = self.signal.shape
 
-        num_buffs = int(ceil(self.length / BUF_SIZE))
+        num_buffs = int(ceil(self.length / buff_size))
 
         # Perform DFT for each buffer
         # buf_size x num_buffs x complex
-        out = np.zeros((BUF_SIZE, 0, 2))
+        out = np.zeros((buff_size, 0, 2))
 
         for i in range(num_buffs):
-            start = i * BUF_SIZE
-            end = (i + 1) * BUF_SIZE
+            start = i * buff_size
+            end = (i + 1) * buff_size
 
             if end > self.length:
                 pad_length = end - self.length
@@ -83,7 +80,7 @@ class Signal():
 
 
 
-    def plot(self, res):
+    def plot(self):
         plt.grid(True)
 
         # Plot time domain
@@ -99,7 +96,7 @@ class Signal():
         ax = plt.gca()
         ax.set_autoscale_on(False)
 
-        freqs, amps = self.signalDFT(res)
+        freqs, amps = self.signalDFT()
 
         _, length = amps.shape
         vecreal = np.vectorize(lambda a: fabs(a.real))
@@ -125,8 +122,8 @@ class Signal():
     """Validate that audio files fill requirement or throw an error otherwise"""
     @staticmethod
     def validate(spf, filepath):
-        if not spf.getnchannels() == AUDIO_REQ["channels"]:
+        if not spf.getnchannels() == channels:
             raise FileExistsError("Audio file (%s) must have %d channel(s), it has %d" % (filepath, AUDIO_REQ["channels"], spf.getnchannels()) )
 
-        if not spf.getframerate() == AUDIO_REQ["sample_rate"]:
+        if not spf.getframerate() == sample_rate:
             raise FileExistsError("Audio file (%s) must  have a sample rate of %d, this has %d" % (filepath, AUDIO_REQ["sample_rate"], spf.getframerate()) )

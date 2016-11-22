@@ -1,8 +1,7 @@
-from DSP import Signal
-import numpy as np
+from .sig import Signal
 import os
-from config import ROOT_DIR, AUDIO_REQ
-
+from config import ROOT_DIR
+from .conf import sample_rate
 
 """Load all the .wav files in a given directory, return list of type Signal"""
 def loadAudio(dir):
@@ -16,8 +15,10 @@ def loadAudio(dir):
         filepath = os.path.join(ROOT_DIR, 'resources/audio/', dir, fn)
 
         try:
-            tracks.append(Signal(filepath, 44100))
+            tracks.append(Signal(filepath, sample_rate))
         except:
+            # Sample wasn't valid, so delete it
+            os.remove(filepath)
             pass
 
     return tracks
