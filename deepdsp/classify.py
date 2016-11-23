@@ -18,8 +18,26 @@ from .data import loadData, library
 
 num_buffs = int(ceil(sample_rate / buff_size))
 
-# def countClasses(labels):
-#     for row in range(len(labels))
+
+def compare(predictions, labels):
+    num_correct = 0
+
+    for i in range(len(predictions)):
+        # (index, val)
+        highest = (0,0)
+        class_index = -1
+        for j in range(len(predictions[i])):
+            if predictions[i][j] > highest[1]:
+                highest = (j, predictions[i][j])
+
+            if labels[i][j] == 1:
+                class_index = j
+
+
+        if highest[0] == class_index:
+            num_correct += 1
+
+    return  num_correct/len(predictions)
 
 
 
@@ -63,15 +81,15 @@ def main():
 
     # highway convolutions with pooling and dropout
     for i in range(3):
-        for j in [8, 4, 2, 1]:
+        for j in [4, 2, 1]:
             # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L1346
-            network = highway_conv_2d(network, 16, j, activation='leaky_relu')
+            network = highway_conv_2d(network, 32, j, activation='leaky_relu')
 
+        network = dropout(network, 0.5)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L266
         network = max_pool_2d(network, 8)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/normalization.py#L20
         network = batch_normalization(network)
-        network = dropout(network, 0.75)
 
     # https://github.com/tflearn/tflearn/blob/51399601c1a4f305db894b871baf743baa15ea00/tflearn/layers/core.py#L96
     network = fully_connected(network, 512, activation='leaky_relu')
@@ -87,24 +105,11 @@ def main():
     # https://github.com/tflearn/tflearn/blob/66c0c9c67b0472cbdc85bae0beb7992fa008480e/tflearn/models/dnn.py#L10
     model = tflearn.DNN(network, tensorboard_verbose=3)
     # https://github.com/tflearn/tflearn/blob/66c0c9c67b0472cbdc85bae0beb7992fa008480e/tflearn/models/dnn.py#L89
-    model.fit(X, Y, n_epoch=5, validation_set=(testX, testY),
+    model.fit(X, Y, n_epoch=4, validation_set=(testX, testY),
               show_metric=True, run_id='convnet_highway_dsp')
 
 
     # Validation
-    # p = model.predict(valX)
-    # print(p)
-    # num_correct = 0
-    # for row in range(len(p)):
-    #     highest_i = 0
-    #     highest = 0
-    #     for col in range(len(row)):
-    #         if p[row][col] > highest:
-    #             highest_i = col
-    #             highest = p[row][col]
-    #
-    #     if highest_i == valY:
-    #         num_correct += 1
-    #
-    # val_acc = num_correct/len(p)
-    # print("Validation accuracy : ", val_acc)
+    pred = model.predict(valX)
+    val_acc = compare(pred, valY)
+    print("Validation accuracy : ", val_acc)
