@@ -12,8 +12,8 @@ from tflearn.layers.estimator import regression
 from tensorflow.python.ops import control_flow_ops
 tf.python.control_flow_ops = control_flow_ops
 
-from .conf import *
-from .data import loadData, library
+from deepdsp.conf import *
+from deepdsp.data import loadData, library
 
 num_buffs = int(ceil(sample_rate / buff_size))
 
