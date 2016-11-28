@@ -15,8 +15,10 @@ tf.python.control_flow_ops = control_flow_ops
 from .conf import *
 from .data import loadData, library
 
-
 num_buffs = int(ceil(sample_rate / buff_size))
+
+# tensorboard
+# tensorboard --logdir='/tmp/tflearn_logs'
 
 
 def compare(predictions, labels):
@@ -47,6 +49,8 @@ def main():
     # ================================
     audio_matrix, classifications = loadData()
 
+    print("Classification counts: ", np.sum(classifications, axis=0))
+
     # Ratios
     ratio_train = .8
     ratio_test = .1
@@ -58,13 +62,17 @@ def main():
 
     # Respective datasets
     X = audio_matrix[:train_len, :]
-    testX = audio_matrix[train_len + 1:, :]
-    valX = audio_matrix[train_len + 1:, :]
+    testX = audio_matrix[train_len + 1:(test_len + train_len), :]
+    valX = audio_matrix[(test_len + train_len) + 1:, :]
 
     # Binary Classifications
     Y = classifications[:train_len, :]
-    testY = classifications[train_len + 1:test_len, :]
-    valY = classifications[test_len + 1:, :]
+    testY = classifications[train_len + 1:(test_len + train_len), :]
+    valY = classifications[(test_len + train_len) + 1:, :]
+
+    print("Train Classification count: ", np.sum(Y, axis=0) )
+    print("Test Classification count: ", np.sum(testY, axis=0) )
+    print("Validation Classification count: ", np.sum(valY, axis=0) )
 
     # dimensions : [tracks, freqs, buffs, (real,imag)]
     X = X.reshape([-1, X.shape[1], X.shape[2], 2])
@@ -78,16 +86,16 @@ def main():
     network = input_data(shape=[None, buff_size, num_buffs, 2], name='input')
 
 
-
     # highway convolutions with pooling and dropout
-    for i in range(3):
-        for j in [4, 2, 1]:
+    for i in range(2):
+        for j in [1, 4]:
+            network = dropout(network, 0.5)
             # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L1346
             network = highway_conv_2d(network, 32, j, activation='leaky_relu')
 
-        network = dropout(network, 0.5)
+        network = dropout(network, 0.2)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L266
-        network = max_pool_2d(network, 8)
+        network = max_pool_2d(network, 16)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/normalization.py#L20
         network = batch_normalization(network)
 
@@ -97,13 +105,13 @@ def main():
     network = fully_connected(network, len(library), activation='softmax')
 
     # https://github.com/tflearn/tflearn/blob/4ba8c8d78bf1bbdfc595bf547bad30580cb4c20b/tflearn/layers/estimator.py#L14
-    network = regression(network, optimizer='adam', learning_rate=0.001,
+    reg = regression(network, optimizer='adam', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
 
     print("Training")
     # Training
     # https://github.com/tflearn/tflearn/blob/66c0c9c67b0472cbdc85bae0beb7992fa008480e/tflearn/models/dnn.py#L10
-    model = tflearn.DNN(network, tensorboard_verbose=3)
+    model = tflearn.DNN(reg, tensorboard_verbose=3)
     # https://github.com/tflearn/tflearn/blob/66c0c9c67b0472cbdc85bae0beb7992fa008480e/tflearn/models/dnn.py#L89
     model.fit(X, Y, n_epoch=4, validation_set=(testX, testY),
               show_metric=True, run_id='convnet_highway_dsp')

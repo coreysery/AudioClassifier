@@ -17,6 +17,12 @@ library = dict(
     # hihat=loadAudio('hihat'),
 )
 
+# Shuffle to arrays in unison
+def unison_shuffled_copies(a, b):
+    assert len(a) == len(b)
+    p = np.random.permutation(len(a))
+    return a[p], b[p]
+
 def loadData():
     # All tracks in a matrix
     audio_matrix = np.zeros((0, buff_size, num_buffs, 2))
@@ -47,8 +53,4 @@ def loadData():
     print("done loading")
 
     # Randomize Audio
-    combined = list(zip(audio_matrix, classifications))
-    shuffle(combined)
-    audio_matrix[:], classifications[:] = zip(*combined)
-
-    return audio_matrix, classifications
+    return unison_shuffled_copies(audio_matrix, classifications)
