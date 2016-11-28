@@ -12,8 +12,10 @@ from tflearn.layers.estimator import regression
 from tensorflow.python.ops import control_flow_ops
 tf.python.control_flow_ops = control_flow_ops
 
-from .conf import *
-from .data import loadData, library
+from deepdsp.conf import *
+from deepdsp.data import loadData, library
+
+
 
 num_buffs = int(ceil(sample_rate / buff_size))
 
@@ -43,7 +45,7 @@ def compare(predictions, labels):
 
 
 
-def main():
+def classifyConv2d():
     # ================================
     # Data loading and preprocessing
     # ================================
@@ -86,17 +88,7 @@ def main():
     network = input_data(shape=[None, buff_size, num_buffs, 2], name='input')
 
 
-    # highway convolutions with pooling and dropout
-    # for i in range(2):
-    #     for j in [1, 4]:
-    #         network = dropout(network, 0.5)
-    #         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L1346
-    #     network = highway_conv_2d(network, 32, j, activation='leaky_relu')
-    #
-    #     network = dropout(network, 0.2)
-    #     # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L266
-    #network = max_pool_2d(network, 16)
-    #     # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/normalization.py#L20
+
     network = batch_normalization(network)
 
     # https://github.com/tflearn/tflearn/blob/51399601c1a4f305db894b871baf743baa15ea00/tflearn/layers/core.py#L96

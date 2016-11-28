@@ -43,7 +43,7 @@ def compare(predictions, labels):
 
 
 
-def main():
+def classifyHighway():
     # ================================
     # Data loading and preprocessing
     # ================================
