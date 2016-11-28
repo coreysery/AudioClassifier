@@ -93,7 +93,6 @@ def main():
             # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L1346
             network = highway_conv_2d(network, 32, j, activation='leaky_relu')
 
-        network = dropout(network, 0.2)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L266
         network = max_pool_2d(network, 16)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/normalization.py#L20
