@@ -2,8 +2,8 @@ from __future__ import division, print_function, absolute_import
 import numpy as np
 from random import shuffle
 from math import ceil
-import tensorflow as tf
 
+import tensorflow as tf
 import tflearn
 from tflearn.layers.core import input_data, dropout, fully_connected
 from tflearn.layers.conv import highway_conv_2d, max_pool_2d
@@ -97,13 +97,13 @@ def classifyConv2d():
     network = fully_connected(network, len(library), activation='softmax', name='softmax')
 
     # https://github.com/tflearn/tflearn/blob/4ba8c8d78bf1bbdfc595bf547bad30580cb4c20b/tflearn/layers/estimator.py#L14
-    reg = regression(network, optimizer='adam', learning_rate=0.001,
+    network = regression(network, optimizer='adam', learning_rate=0.001,
                          loss='categorical_crossentropy', name='target')
 
     print("Training")
     # Training
     # https://github.com/tflearn/tflearn/blob/66c0c9c67b0472cbdc85bae0beb7992fa008480e/tflearn/models/dnn.py#L10
-    model = tflearn.DNN(reg, tensorboard_verbose=3)
+    model = tflearn.DNN(network, tensorboard_verbose=3)
 
     model.fit(X, Y, n_epoch=10, validation_set=(testX, testY),
               show_metric=True, run_id='convnet_dsp')
