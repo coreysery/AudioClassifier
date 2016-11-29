@@ -3,6 +3,7 @@ from __future__ import division, print_function, absolute_import
 import numpy as np
 from random import shuffle
 from math import ceil
+import pickle
 
 from .helpers import loadAudio
 from .conf import *
@@ -13,8 +14,8 @@ library = dict(
     kick=loadAudio('kick'),
     snare=loadAudio('snare'),
     # clap=loadAudio('clap'),
-    # tom=loadAudio('tom'),
-    # hihat=loadAudio('hihat'),
+    tom=loadAudio('tom'),
+    hihat=loadAudio('hihat'),
 )
 
 # Shuffle to arrays in unison
@@ -24,6 +25,17 @@ def unison_shuffled_copies(a, b):
     return a[p], b[p]
 
 def loadData():
+
+    # reload audio object from file
+    try:
+        audio_file = open(r'resources/audio.pkl', 'rb')
+        audio_matrix, classifications = pickle.load(audio_file)
+        audio_file.close()
+        return unison_shuffled_copies(audio_matrix, classifications)
+    except:
+        pass
+
+
     # All tracks in a matrix
     audio_matrix = np.zeros((0, buff_size, num_buffs, 2))
 
@@ -49,6 +61,10 @@ def loadData():
             dft = track.signalDFT()
             dft = dft.reshape((1, dft.shape[0], dft.shape[1], 2))
             audio_matrix = np.vstack((audio_matrix, dft))
+
+    file = open(r'resources/audio.pkl', 'wb')
+    pickle.dump((audio_matrix, classifications), file)
+    file.close()
 
     print("done loading")
 

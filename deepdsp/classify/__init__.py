@@ -33,7 +33,7 @@ print("Train Classification count: ", np.sum(Y, axis=0))
 print("Test Classification count: ", np.sum(testY, axis=0))
 print("Validation Classification count: ", np.sum(valY, axis=0))
 
-# dimensions : [tracks, freqs, buffs, (real,imag)]
+# dimensions : [tracks * buffs * freqs * (real,imag)]
 X = X.reshape([-1, X.shape[1], X.shape[2], 2])
 testX = testX.reshape([-1, testX.shape[1], testX.shape[2], 2])
 valX = valX.reshape([-1, valX.shape[1], valX.shape[2], 2])

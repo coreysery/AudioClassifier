@@ -3,14 +3,13 @@ import os
 import subprocess
 import numpy as np
 from config import ROOT_DIR
-from .conf import sample_rate
+from .conf import sample_rate, max_tracks
 
 subprocess.call("./bin/downsample.sh", shell=True)
 
 """Load all the .wav files in a given directory, return list of type Signal"""
 def loadAudio(dir):
     tracks = []
-    max_tracks = 200
     i = 1
 
     for fn in os.listdir(ROOT_DIR + '/resources/tmp/' + dir):
@@ -56,5 +55,6 @@ def compare(predictions, labels):
     f = flatten(predictions)
     counts = np.sum(f, axis=0)
     print("Predictions for each class: ", counts)
+    print("Actual for each class: ", np.sum(labels, axis=0))
 
     return  num_correct/len(predictions)
