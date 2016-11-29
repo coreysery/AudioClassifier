@@ -1,5 +1,5 @@
 .idea/
 __pychache__/
-deepdsp/__pycache__/classify.cpython-35.pyc
-deepdsp/__pycache__/helpers.cpython-35.pyc
+deepdsp/__pycache__/*
+deepdsp/classify/__pycache__/*
 resources/audio
