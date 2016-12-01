@@ -1,5 +1,4 @@
 .idea/
 __pychache__/
-deepdsp/__pycache__/*
-deepdsp/classify/__pycache__/*
+deepdsp/**/__pycache__/*
 resources/audio

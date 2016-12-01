@@ -4,19 +4,17 @@ import numpy as np
 from random import shuffle
 from math import ceil
 import pickle
+import subprocess
 
 from .helpers import loadAudio
-from .conf import *
+from .conf import sample_rate, buff_size, classes
+from config import ROOT_DIR
 
 num_buffs = int(ceil(sample_rate / buff_size))
 
-library = dict(
-    kick=loadAudio('kick'),
-    snare=loadAudio('snare'),
-    # clap=loadAudio('clap'),
-    tom=loadAudio('tom'),
-    hihat=loadAudio('hihat'),
-)
+
+
+library = dict()
 
 # Shuffle to arrays in unison
 def unison_shuffled_copies(a, b):
@@ -28,13 +26,18 @@ def loadData():
 
     # reload audio object from file
     try:
-        audio_file = open(r'resources/audio.pkl', 'rb')
+        audio_file = open(ROOT_DIR + r'/resources/audio.pkl', 'rb')
         audio_matrix, classifications = pickle.load(audio_file)
         audio_file.close()
         return unison_shuffled_copies(audio_matrix, classifications)
     except:
+        # If no pickle file
         pass
 
+
+    subprocess.call(ROOT_DIR + "/bin/downsample.sh", shell=True)
+    for c in classes:
+        library[c] = loadAudio(c)
 
     # All tracks in a matrix
     audio_matrix = np.zeros((0, buff_size, num_buffs, 2))

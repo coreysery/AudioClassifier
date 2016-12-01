@@ -1,11 +1,10 @@
 import numpy as np
-from random import shuffle
-from deepdsp.data import loadData, library
-
+from deepdsp.data import loadData
 
 # ================================
 # Data loading and preprocessing
 # ================================
+
 audio_matrix, classifications = loadData()
 
 print("Classification counts: ", np.sum(classifications, axis=0))

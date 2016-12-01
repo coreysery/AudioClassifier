@@ -1,11 +1,8 @@
 from .sig import Signal
 import os
-import subprocess
 import numpy as np
 from config import ROOT_DIR
 from .conf import sample_rate, max_tracks
-
-subprocess.call("./bin/downsample.sh", shell=True)
 
 """Load all the .wav files in a given directory, return list of type Signal"""
 def loadAudio(dir):

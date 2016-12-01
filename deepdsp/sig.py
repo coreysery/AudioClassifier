@@ -1,9 +1,6 @@
 import wave
-import matplotlib.pyplot as plt
 import numpy as np
 
-from math import ceil, fabs
-# from config import AUDIO
 from .conf import *
 
 
@@ -78,45 +75,19 @@ class Signal():
 
         return out
 
-
-
-    def plot(self):
-        plt.grid(True)
-
-        # Plot time domain
-        plt.figure(1)
-        plt.subplot(211)
-        plt.title('Signal Wave')
-        plt.xscale('linear')
-        timeDomain = self.signal.reshape(self.length, 1)
-        plt.plot(timeDomain)
-
-        # Plot freq domain
-        plt.subplot(212)
-        ax = plt.gca()
-        ax.set_autoscale_on(False)
-
-        freqs, amps = self.signalDFT()
-
-        _, length = amps.shape
-        vecreal = np.vectorize(lambda a: fabs(a.real))
-        amps = vecreal(amps)
-
-        plt.ion()
-
-        for i in range(length):
-            plt.title('Frequencies')
-            plt.xscale('log')
-            ax.set_autoscale_on(False)
-            # plt.axis([0.0, 25000.0, -0.1, 1.0])
-
-            plt.plot(freqs, amps[:,i])
-            plt.pause(0.5)
-            plt.cla()
-
-        plt.pause(4)
-
-        plt.show()
+    @staticmethod
+    def IDFT(track):
+        """Take a input from the frequency domain and turns it into a wav file"""
+        out = np.zeros((0))
+        print(track.size)
+        print(out.size)
+        for i in range(len(track)):
+            buff = track[i]
+            print(buff.size)
+            buff_sig = np.fft.ifft(buff)
+            print(buff_sig.size)
+            out = np.hstack((out, buff_sig))
+            print(out.size)
 
 
     """Validate that audio files fill requirement or throw an error otherwise"""
