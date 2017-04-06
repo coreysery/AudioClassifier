@@ -1,29 +1,35 @@
-from .sig import Signal
 import os
 import numpy as np
+
 from config import ROOT_DIR
-from .conf import sample_rate, max_tracks
+from .sig import Signal
+from .conf import conf
+
+
 
 """Load all the .wav files in a given directory, return list of type Signal"""
 def loadAudio(dir):
     tracks = []
     i = 1
 
-    for fn in os.listdir(ROOT_DIR + '/resources/tmp/' + dir):
+    for fn in os.listdir(ROOT_DIR + '/resources/audio/' + dir):
         # Double check we are loading a wav file
         if not fn.lower().endswith(('.wav')):
             continue
 
-        filepath = os.path.join(ROOT_DIR, 'resources/tmp/', dir, fn)
+        filepath = os.path.join(ROOT_DIR, 'resources/audio/', dir, fn)
 
-        try:
-            tracks.append(Signal(filepath, sample_rate))
-        except:
+        print(filepath)
+
+        # try:
+        tracks.append(Signal(filepath))
+        # except:
             # Sample wasn't valid, so delete it
-            os.remove(filepath)
-            pass
+            # os.remove(filepath)
+            # print("error")
+            # pass
 
-        if i > max_tracks:
+        if i > conf["max_tracks"]:
             break
         else:
             i += 1

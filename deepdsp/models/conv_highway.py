@@ -5,13 +5,13 @@ from tflearn.layers.conv import highway_conv_2d, max_pool_2d
 from tflearn.layers.normalization import local_response_normalization, batch_normalization
 from tflearn.layers.estimator import regression
 
-from deepdsp.conf import buff_size, num_buffs, classes
+from deepdsp.conf import conf
 
 # Outdated version hack
 from tensorflow.python.ops import control_flow_ops
 tf.python.control_flow_ops = control_flow_ops
 
-network = input_data(shape=[None, buff_size, num_buffs, 2], name='input')
+network = input_data(shape=[None, conf["buff_size"], conf["num_buffs"], 4], name='input')
 
 # highway convolutions with pooling and dropout
 for i in range(2):
@@ -28,7 +28,7 @@ for i in range(2):
 # https://github.com/tflearn/tflearn/blob/51399601c1a4f305db894b871baf743baa15ea00/tflearn/layers/core.py#L96
 network = fully_connected(network, 128, activation='prelu')
 network = fully_connected(network, 32, activation='elu')
-network = fully_connected(network, len(classes), activation='softmax')
+network = fully_connected(network, len(conf["classes"]), activation='softmax')
 
 # https://github.com/tflearn/tflearn/blob/4ba8c8d78bf1bbdfc595bf547bad30580cb4c20b/tflearn/layers/estimator.py#L14
 network = regression(network, optimizer='adam', learning_rate=0.005,
