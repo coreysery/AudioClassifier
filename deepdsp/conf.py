@@ -1,7 +1,7 @@
 from math import ceil
 
 sample_rate = 48000
-max_length = 1 # in seconds
+max_length = 2 # in seconds
 buff_size = 1024
 
 conf = {
@@ -22,18 +22,20 @@ conf = {
     # Limit tracks per type to keep types balanced
     "max_tracks": 200,
 
+    "randomize": True,
+
     "classes": [
-        "head.0",
-        "head.30",
-        "head.60",
-        "head.90",
-        "head.120",
-        "head.150",
-        "head.180",
-        "head.210",
-        "head.240",
-        "head.270",
-        "head.300",
-        "head.330",
+        "head_0",
+        "head_30",
+        "head_60",
+        "head_90",
+        "head_120",
+        "head_150",
+        "head_180",
+        "head_210",
+        "head_240",
+        "head_270",
+        "head_300",
+        "head_330",
     ],
 }

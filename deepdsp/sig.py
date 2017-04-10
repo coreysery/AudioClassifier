@@ -28,17 +28,15 @@ class Signal():
             # self.sampleRate = spf.getframerate()
             # self.channels = spf.getnchannels()
 
-            # audio is 16 bit
-            # Sets the digital amp to be between -1 and 1. type float64
-            maxAmp = (2 ** 16) / 2
-            normalize = np.vectorize(lambda amp: amp / maxAmp)
+            # duration of sound in samples
+            dur = sound.duration_seconds * conf["sample_rate"]
 
-            if sound.duration_seconds > length:
+            if dur > length:
                 # If file is longer than the max length
                 sound = sound[length:]
             else:
                 # If the file is shorter than the max length
-                pad = (length - sound.duration_seconds)
+                pad = (length - dur)
                 silence = AudioSegment.silent(duration=pad, frame_rate=conf["sample_rate"])
                 sound = sound.append(silence, crossfade=0)
 
@@ -47,6 +45,10 @@ class Signal():
             # print(left.get_array_of_samples())
             signal = np.array([left.get_array_of_samples(), right.get_array_of_samples()])
 
+            # audio is 16 bit
+            # Sets the digital amp to be between -1 and 1. type float64
+            maxAmp = (2 ** conf["bitDepth"]) / 2
+            normalize = np.vectorize(lambda amp: amp / maxAmp)
             self.signal = normalize(signal[:, :length])
 
             self.signal = self.signal.reshape(length, conf["channels"])
@@ -71,6 +73,7 @@ class Signal():
             end = (i + 1) * conf["buff_size"]
 
             if end > self.length:
+                # if signal is to short
                 pad_length = end - self.length
                 pad = np.zeros((pad_length, conf["channels"]))
                 signal_chunk = np.vstack((self.signal[start:], pad))
@@ -78,24 +81,14 @@ class Signal():
                 signal_chunk = self.signal[ start:end, : ]
 
             chunk = np.fft.fft2(signal_chunk)
-            # chunk = [[ (left(real) + left(imag), (right(real) + right(imag) ]]
 
             newChunk = np.zeros((0, 4))
-
-            # newChunk = np.zeros((0, 2, 2))
-            #
-            # splitComplex = np.vectorize(lambda c: np.array([c.real, c.imag]))
-            #
-            # for _,v in enumerate(chunk):
-            #     stereo = np.array([[splitComplex(v[0]), splitComplex(v[1])]])
-            #     newChunk = np.vstack((newChunk, stereo))
 
             for _, val in enumerate(chunk):
                 l, r = val
                 k = np.array([[l.real, l.imag, r.real, r.imag]])
                 newChunk = np.vstack((newChunk, k))
 
-            # newChunk = newChunk.reshape((newChunk.shape[0], 1, conf["channels"], 2))
             newChunk = newChunk.reshape((newChunk.shape[0], 1, 4))
 
             out = np.hstack((out, newChunk))

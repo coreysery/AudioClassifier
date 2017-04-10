@@ -6,7 +6,6 @@ from .sig import Signal
 from .conf import conf
 
 
-
 """Load all the .wav files in a given directory, return list of type Signal"""
 def loadAudio(dir):
     tracks = []
@@ -58,6 +57,6 @@ def compare(predictions, labels):
     f = flatten(predictions)
     counts = np.sum(f, axis=0)
     print("Predictions for each class: ", counts)
-    print("Actual for each class: ", np.sum(labels, axis=0))
+    print("Actual for each class:      ", np.sum(labels, axis=0))
 
     return  num_correct/len(predictions)

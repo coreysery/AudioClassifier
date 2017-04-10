@@ -6,10 +6,6 @@ from tflearn.layers.estimator import regression
 
 from deepdsp.conf import conf
 
-# Outdated version hack
-from tensorflow.python.ops import control_flow_ops
-tf.python.control_flow_ops = control_flow_ops
-
 network = input_data(shape=[None, conf["buff_size"], conf["num_buffs"], 2], name='input')
 
 network = batch_normalization(network)

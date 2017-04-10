@@ -1,5 +1,7 @@
+from random import shuffle
 import numpy as np
 from deepdsp.data import loadData
+from deepdsp.conf import conf
 
 # ================================
 # Data loading and preprocessing
@@ -7,7 +9,17 @@ from deepdsp.data import loadData
 
 audio_matrix, classifications = loadData()
 
-print("Classification counts: ", np.sum(classifications, axis=0))
+classes = [
+    0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330
+]
+
+if conf["randomize"]:
+    combined = list(zip(audio_matrix, classifications))
+    shuffle(combined)
+    audio_matrix[:], classifications[:] = zip(*combined)
+
+print("Classes:                         ", classes)
+print("Classification counts:           ", np.sum(classifications, axis=0))
 
 # Ratios
 ratio_train = .8
@@ -28,8 +40,8 @@ Y = classifications[:train_len, :]
 testY = classifications[train_len + 1:(test_len + train_len), :]
 valY = classifications[(test_len + train_len) + 1:, :]
 
-print("Train Classification count: ", np.sum(Y, axis=0))
-print("Test Classification count: ", np.sum(testY, axis=0))
+print("Train Classification count:      ", np.sum(Y, axis=0))
+print("Test Classification count:       ", np.sum(testY, axis=0))
 print("Validation Classification count: ", np.sum(valY, axis=0))
 
 # dimensions : [tracks * buffs * freqs * channel(real,imag)]

@@ -47,8 +47,9 @@ def loadData():
     # kind : ie kick, snare, etc
     # samples_list : tracks
     for i, (kind, samples_list) in enumerate(library.items()):
-        # Randomize list of audio
-        shuffle(samples_list)
+        if (conf["randomize"]):
+            # Randomize list of audio
+            shuffle(samples_list)
 
         # Set binary classifications for this kind
         class_row = np.zeros((len(samples_list), len(library)))
