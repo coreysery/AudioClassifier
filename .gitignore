@@ -3,3 +3,4 @@ __pychache__/
 deepdsp/**/__pycache__/*
 deep/
 resources/
+resources/*
