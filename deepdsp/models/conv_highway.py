@@ -13,7 +13,7 @@ network = input_data(shape=[None, conf["buff_size"], conf["num_buffs"], 4], name
 # highway convolutions with pooling and dropout
 for i in range(2):
     for j in [4, 6, 12]:
-        network = dropout(network, 0.9)
+        network = dropout(network, 0.95)
         # https://github.com/tflearn/tflearn/blob/2faad812dc35e08457dc6bd86b15392446cffd87/tflearn/layers/conv.py#L1346
         network = highway_conv_2d(network, 4, j, activation='leaky_relu')
 
@@ -24,7 +24,7 @@ for i in range(2):
     network = batch_normalization(network)
 
 # https://github.com/tflearn/tflearn/blob/51399601c1a4f305db894b871baf743baa15ea00/tflearn/layers/core.py#L96
-network = fully_connected(network, 128, activation='prelu')
+network = fully_connected(network, 150, activation='prelu')
 network = fully_connected(network, 32, activation='elu')
 network = fully_connected(network, len(conf["classes"]), activation='softmax')
 
