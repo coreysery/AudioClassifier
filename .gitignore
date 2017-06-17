@@ -1,8 +1,7 @@
 .idea/
-__pychache__/
+__pychache__/*
 **/__pychache__/*
 deepdsp/**/__pycache__/*
 deep/
 resources/
-resources/*
 .DS_Store
